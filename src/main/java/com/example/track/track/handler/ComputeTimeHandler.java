@@ -16,7 +16,7 @@
 //public class ComputeTimeHandler {
 //    public static Logger log = Logger.getLogger(ComputeTimeHandler.class.toString());
 //
-//    @Pointcut("@annotation(com.example.track.track.annotation.ComputeTime)")
+//    @Pointcut("execution(* com.example..*.*(..))")
 //    public void preProcess(){
 //    }
 //

@@ -28,6 +28,6 @@ koTime:
     language: chinese # 控制台输出语言（english/chinese）非必填，默认chinese
   ime:
     threshold: 800.0 # 时间阈值，用于前端展示，大于阈值显示红色，小于阈值显示绿色，非必填，默认800
-  pointcut: execution(* com.example.track.controller.*.*(..))
+  pointcut: execution(* com.example..*.*(..))
 
 
