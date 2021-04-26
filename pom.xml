@@ -35,16 +35,8 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.langpy</groupId>
-            <artifactId>ko-time</artifactId>
-            <version>1.8</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.9.5</version>
-            <scope>provided</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!--        <dependency>-->

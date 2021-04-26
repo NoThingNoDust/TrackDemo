@@ -1,4 +1,25 @@
 spring:
+  mvc:
+    static-path-pattern: /static/**
+  freemarker:
+    allow-request-override: false
+    cache: false
+    check-template-location: true
+    charset: UTF-8
+    content-type: text/html
+    suffix: .html
+    template-loader-path: classpath:/templates
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: false
+    request-context-attribute: ctx
+
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+    content-type: text/html
   profiles:
     active: koTime
 koTime:
@@ -7,4 +28,6 @@ koTime:
     language: chinese # 控制台输出语言（english/chinese）非必填，默认chinese
   ime:
     threshold: 800.0 # 时间阈值，用于前端展示，大于阈值显示红色，小于阈值显示绿色，非必填，默认800
-  pointcut: execution(* com.example.firewall.controller.*.*(..))
+  pointcut: execution(* com.example.track.controller.*.*(..))
+
+
