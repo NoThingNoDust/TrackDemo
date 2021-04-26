@@ -14,12 +14,12 @@ public class Common {
     public static Logger log = Logger.getLogger(Common.class.toString());
 
     public static StackTraceElement filter(StackTraceElement[] stacks,String packName) {
-//        String[] packNameSplit = packName.split("\\.");
-//        String filter = packNameSplit.length>1 ? packNameSplit[0]+"."+packNameSplit[1] : packNameSplit[0];
+        String[] packNameSplit = packName.split("\\.");
+        String filter = packNameSplit.length>1 ? packNameSplit[0]+"."+packNameSplit[1] : packNameSplit[0];
         int stacksLength = stacks.length;
         for (int i = 0; i < stacksLength; i++) {
             StackTraceElement stack = stacks[i];
-            if (stack.getClassName().startsWith(packName)&& !stack.getClassName().contains("$")) {
+            if (stack.getClassName().startsWith(filter)&& !stack.getClassName().contains("$")) {
                 return stack;
             }
         }
