@@ -11,8 +11,8 @@ public class HelloService {
 
 
     public void testAAA() throws InterruptedException {
-        testService.testCCC();
-        testService.testBBB();
+//        testService.testCCC();
+//        testService.testBBB();
         Thread.sleep(19);
     }
 }
