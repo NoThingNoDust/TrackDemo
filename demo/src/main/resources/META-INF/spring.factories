@@ -1,2 +1,2 @@
 #org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-#  com.demo.track.config.LoadConfig
+#  com.example.demo.track.config.LoadConfig

@@ -1,6 +1,8 @@
 package com.example.god.controller;
 
+import com.example.god.config.AgentConfig;
 import com.sun.tools.attach.VirtualMachine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,8 +15,11 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
-@RestController("/god")
+@RestController
 public class GodController {
+
+    @Autowired
+    private AgentConfig agentConfig;
 
     @PostMapping("/redefine")
     public String redefine() {
@@ -26,7 +31,7 @@ public class GodController {
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         String pid = runtimeMXBean.getName().split("@")[0];
         VirtualMachine virtualMachine = VirtualMachine.attach(pid);
-        virtualMachine.loadAgent("/Users/liule/Documents/project/TrackDemo/agent/target/agent-0.0.2.jar", "/Users/liule/Documents/HelloService.class");
+        virtualMachine.loadAgent(agentConfig.getAgentPath(), "/Users/liule/Documents/HelloService.class");
 //        virtualMachine.loadAgentPath("agentPath", "newClassPath");
         virtualMachine.detach();
         return "OK";

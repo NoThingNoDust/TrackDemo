@@ -6,7 +6,6 @@
     <modules>
         <module>agent</module>
         <module>demo</module>
-        <module>god</module>
     </modules>
     <groupId>com.example</groupId>
     <artifactId>TrackDemo</artifactId>
