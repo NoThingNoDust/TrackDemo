@@ -16,11 +16,12 @@ public class RunTimeNode implements Comparable<RunTimeNode> {
     private String avgRunTimeUnit = "ms";
     private MethodType methodType;
     private List<RunTimeNode> children;
+    private RunTimeNode parent;
+
     @Override
     public int compareTo(RunTimeNode ob) {
         return this.avgRunTime.compareTo(ob.getAvgRunTime());
     }
-
 
 
     public Double getValue() {
@@ -89,6 +90,14 @@ public class RunTimeNode implements Comparable<RunTimeNode> {
         this.children = children;
     }
 
+    public RunTimeNode getParent() {
+        return parent;
+    }
+
+    public void setParent(RunTimeNode parent) {
+        this.parent = parent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -117,5 +126,12 @@ public class RunTimeNode implements Comparable<RunTimeNode> {
                 ", methodType=" + methodType +
                 ", children=" + children +
                 '}';
+    }
+
+    public void print() {
+        System.out.println(methodName + "调用了" + children.size() + "个方法");
+        for (RunTimeNode child : children) {
+            child.print();
+        }
     }
 }
