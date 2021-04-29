@@ -24,7 +24,6 @@ public class DefaultConfig {
     @PostConstruct
     public void function() {
 
-        // TODO: 2021/4/28 liule yml配置文件读取失败
         KoTimeConfig config = new KoTimeConfig();
         config.setLogEnable(logEnable);
         config.setLogLanguage(logLanguage);
@@ -35,8 +34,8 @@ public class DefaultConfig {
     @Bean
     public AspectJExpressionPointcutAdvisor configurabledvisor() {
         AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
-        advisor.setExpression(pointcut);
-//        advisor.setExpression(pointcut + " && !execution(* com.example.demo.track..*.*(..))");
+//        advisor.setExpression(pointcut);
+        advisor.setExpression(pointcut + " && !execution(* com.example.demo.track..*.*(..))");
         advisor.setAdvice(new RunTimeHandler());
         return advisor;
     }
