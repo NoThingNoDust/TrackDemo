@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.HelloService;
+import com.example.god.model.jvm.JvmUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
@@ -18,6 +20,9 @@ public class HelloController {
 
    @Autowired
    private HelloService helloService;
+
+   @Resource
+   private JvmUtil jvmUtil;
 
     @GetMapping("/hello")
     public String hello() throws UnknownHostException, InterruptedException {
@@ -41,6 +46,12 @@ public class HelloController {
         //执行编译任务
         task.call();
         return "OK";
+    }
+
+    @GetMapping("/jvm")
+    public Object jvm() {
+        return jvmUtil.getJvmDetails();
+
     }
 
 }
