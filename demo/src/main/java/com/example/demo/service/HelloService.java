@@ -17,6 +17,7 @@ public class HelloService {
         System.out.println("a");
         this.testBBB();
         helloService.testCCC();
+        testService.testCCC();
     }
 
     public void testBBB() throws InterruptedException {

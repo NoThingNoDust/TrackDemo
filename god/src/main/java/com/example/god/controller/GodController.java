@@ -1,39 +1,36 @@
 package com.example.god.controller;
 
-import com.example.god.config.AgentConfig;
-import com.sun.tools.attach.VirtualMachine;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.god.config.Configure;
+import com.example.god.model.jvm.JvmUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 
 @RestController
 public class GodController {
 
-    @Autowired
-    private AgentConfig agentConfig;
+    @Resource
+    private Configure configure;
 
-    @PostMapping("/redefine")
-    public String redefine() {
-        return "OK";
+    @Resource
+    private JvmUtil jvmUtil;
+
+    @GetMapping("/jvm")
+    public Object jvm() {
+        return jvmUtil.getJvmDetails();
     }
+
 
     @GetMapping("/replace")
     public String replace() throws Exception {
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        String pid = runtimeMXBean.getName().split("@")[0];
-        VirtualMachine virtualMachine = VirtualMachine.attach(pid);
-        virtualMachine.loadAgent(agentConfig.getAgentPath(), "/Users/liule/Documents/HelloService.class");
-//        virtualMachine.loadAgentPath("agentPath", "newClassPath");
-        virtualMachine.detach();
+
         return "OK";
     }
 
