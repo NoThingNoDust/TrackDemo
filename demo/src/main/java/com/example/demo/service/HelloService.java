@@ -8,12 +8,24 @@ public class HelloService {
 
     @Autowired
     private TestService testService;
+    @Autowired
+    private HelloService helloService;
 
 
     public void testAAA() throws InterruptedException {
-//        testService.testCCC();
-//        testService.testBBB();
         Thread.sleep(19);
-        System.out.println("=======未替换");
+        System.out.println("a");
+        this.testBBB();
+        helloService.testCCC();
+    }
+
+    public void testBBB() throws InterruptedException {
+        Thread.sleep(19);
+        System.out.println("b");
+    }
+
+    public void testCCC() throws InterruptedException {
+        Thread.sleep(19);
+        System.out.println("c");
     }
 }
