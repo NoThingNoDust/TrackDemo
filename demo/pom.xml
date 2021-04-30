@@ -22,7 +22,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.example</groupId>
+            <groupId>com.liule</groupId>
             <artifactId>god</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
