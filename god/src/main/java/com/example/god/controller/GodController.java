@@ -1,6 +1,5 @@
 package com.example.god.controller;
 
-import com.example.god.config.Configure;
 import com.example.god.model.jvm.JvmUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,11 +12,8 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.File;
 
-@RestController
+@RestController("/god")
 public class GodController {
-
-    @Resource
-    private Configure configure;
 
     @Resource
     private JvmUtil jvmUtil;
@@ -30,7 +26,6 @@ public class GodController {
 
     @GetMapping("/replace")
     public String replace() throws Exception {
-
         return "OK";
     }
 
