@@ -26,4 +26,8 @@ public class JvmModel {
         }
     }
 
+    public Map<String, List<JvmInfo>> getJvmInfo() {
+        return jvmInfo;
+    }
+
 }

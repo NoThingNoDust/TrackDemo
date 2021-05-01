@@ -2,7 +2,10 @@ package com.example.god.config;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import sun.management.HotspotThreadMBean;
+import sun.management.ManagementFactoryHelper;
 
 import java.lang.management.*;
 import java.util.Collection;
@@ -23,5 +26,13 @@ public class Configure {
     //    private Collection<MemoryPoolMXBean> memoryPoolMXBeans = ManagementFactory.getMemoryPoolMXBeans();
     private OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
     private ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+
+
+    private HotspotThreadMBean hotspotThreadMBean;
+
+    @Bean
+    public void initHotspotThreadMBean() {
+        hotspotThreadMBean = ManagementFactoryHelper.getHotspotThreadMBean();
+    }
 
 }

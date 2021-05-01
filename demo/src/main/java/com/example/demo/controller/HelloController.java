@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.example.demo.service.HelloService;
 import com.example.god.model.jvm.JvmUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,8 @@ public class HelloController {
     }
 
     @GetMapping("/jvm")
-    public Object jvm() {
-        return jvmUtil.getJvmDetails();
+    public String jvm() {
+        return JSON.toJSONString(jvmUtil.getJvmDetails().getJvmInfo());
 
     }
 
