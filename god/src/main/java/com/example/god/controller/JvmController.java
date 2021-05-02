@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.text.SimpleDateFormat;
@@ -174,25 +173,29 @@ public class JvmController {
     @PostMapping("/option")
     public String updateVmOption(@RequestParam(value = "name") String name,
                                  @RequestParam(value = "value") String value) {
-        if (name == null || "".equals(name) || value == null || "".equals(value)) {
-            return null;
+        try {
+            if (name == null || "".equals(name) || value == null || "".equals(value)) {
+                return null;
+            }
+            HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean = ManagementFactory
+                    .getPlatformMXBean(HotSpotDiagnosticMXBean.class);
+            VMOption vmOption = hotSpotDiagnosticMXBean.getVMOption(name);
+            if (Objects.isNull(vmOption)) {
+                return null;
+            }
+            String optionValue = vmOption.getValue();
+            if (optionValue.equals(value)) {
+                return null;
+            }
+            hotSpotDiagnosticMXBean.setVMOption(name, value);
+            String afterValue = hotSpotDiagnosticMXBean.getVMOption(name).getValue();
+            return name + " from" + optionValue + " change to " + afterValue;
+        } catch (Throwable t) {
+            return "Error during setting vm option: " + t.getMessage();
         }
-        HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean = ManagementFactory
-                .getPlatformMXBean(HotSpotDiagnosticMXBean.class);
-        VMOption vmOption = hotSpotDiagnosticMXBean.getVMOption(name);
-        if (Objects.isNull(vmOption)) {
-            return null;
-        }
-        String optionValue = vmOption.getValue();
-        if (optionValue.equals(value)) {
-            return null;
-        }
-        hotSpotDiagnosticMXBean.setVMOption(name, value);
-        String afterValue = hotSpotDiagnosticMXBean.getVMOption(name).getValue();
-        return name + " from" + optionValue + " change to " + afterValue;
     }
 
-    @GetMapping("heapdump")
+    @GetMapping("heapDump")
     public String heapDump(@RequestParam(value = "live", defaultValue = "false") boolean live) {
         try {
             String dumpFile = configure.getCachePath();
@@ -215,6 +218,44 @@ public class JvmController {
             return "OK";
         } catch (Throwable t) {
             return "heap dump error: " + t.getMessage();
+        }
+    }
+
+    @GetMapping("/systemEnv")
+    public String systemEnv(@RequestParam(value = "name") String name) {
+        if (name == null || "".equals(name)) {
+            return JSONObject.toJSONString(System.getenv());
+        } else {
+            return JSONObject.toJSONString(System.getenv(name));
+        }
+    }
+
+
+    @GetMapping("/systemProperty")
+    public String systemProperty(@RequestParam(value = "name") String name) {
+        if (name == null || "".equals(name)) {
+            return JSONObject.toJSONString(System.getProperties());
+        } else {
+            return JSONObject.toJSONString(System.getProperty(name));
+        }
+    }
+
+    @PostMapping("/systemProperty")
+    public String updateSystemProperty(@RequestParam(value = "name") String name,
+                                       @RequestParam(value = "value") String value) {
+        try {
+            if (name == null || "".equals(name)) {
+                return "name can not be null";
+            } else {
+                String property = System.getProperty(name);
+                if (property.equals(value)) {
+                    return "No need to modify";
+                }
+                System.setProperty(name, value);
+                return "OK";
+            }
+        } catch (Throwable t) {
+            return "Error during setting system property: " + t.getMessage();
         }
     }
 
