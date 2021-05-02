@@ -17,6 +17,9 @@ public class Configure {
     @Value("${god.agent.path:/Users/liule/Documents/agent/agent-0.0.2.jar}")
     private String agentPath;
 
+    @Value("${god.cache.path:/Users/liule/Documents}")
+    private String cachePath;
+
     private RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     private ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
     private CompilationMXBean compilationMXBean = ManagementFactory.getCompilationMXBean();

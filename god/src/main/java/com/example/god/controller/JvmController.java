@@ -10,8 +10,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -189,6 +192,32 @@ public class JvmController {
         return name + " from" + optionValue + " change to " + afterValue;
     }
 
+    @GetMapping("heapdump")
+    public String heapDump(@RequestParam(value = "live", defaultValue = "false") boolean live) {
+        try {
+            String dumpFile = configure.getCachePath();
+            if (!dumpFile.endsWith("/")) {
+                dumpFile = dumpFile + "/";
+            }
+            dumpFile = dumpFile + "heapdump/";
+            File fileDir = new File(dumpFile);
+            if (!fileDir.exists()) {
+                boolean mkdirs = fileDir.mkdirs();
+                if (!mkdirs) {
+                    return "creat cache directory failure";
+                }
+            }
+            String filePath = dumpFile + getHeapDumpName(live);
+
+            HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean = ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class);
+            hotSpotDiagnosticMXBean.dumpHeap(filePath, live);
+
+            return "OK";
+        } catch (Throwable t) {
+            return "heap dump error: " + t.getMessage();
+        }
+    }
+
     private long[] unboxing(List<Long> list) {
         if (CollectionUtils.isEmpty(list)) {
             return new long[0];
@@ -198,6 +227,11 @@ public class JvmController {
             result[i] = list.get(i);
         }
         return result;
+    }
+
+    private String getHeapDumpName(boolean live) {
+        String date = new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(new Date());
+        return "heapdump" + date + (live ? "-live" : "") + ".hprof";
     }
 
 
