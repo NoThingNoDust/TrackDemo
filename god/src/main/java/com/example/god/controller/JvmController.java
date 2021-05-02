@@ -3,24 +3,19 @@ package com.example.god.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.example.god.config.Configure;
 import com.example.god.model.jvm.JvmUtil;
-import com.example.god.model.thread.BusyThreadInfo;
-import com.example.god.model.thread.ThreadModel;
-import com.example.god.model.thread.ThreadUtil;
-import com.example.god.model.thread.ThreadVO;
+import com.example.god.model.thread.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/jvm")
 public class JvmController {
+
+    public static final List<String> threadStates = Arrays.asList("NEW", "RUNNABLE", "BLOCKED", "WAITING", "TIMED_WAITING", "TERMINATED");
 
     @Resource
     private JvmUtil jvmUtil;
@@ -33,21 +28,25 @@ public class JvmController {
         return JSONObject.toJSONString(jvmUtil.getJvmDetails().getJvmInfo());
     }
 
-    @GetMapping("/thread")
-    public String thread(@RequestParam(value = "busy", defaultValue = "5") Integer busy,
+    @GetMapping("/thread/busy")
+    public String thread(@RequestParam(value = "top", defaultValue = "5") Integer busy,
                          @RequestParam(value = "interval", defaultValue = "2000") Integer interval) {
         if (busy <= 0) {
             return "error";
         }
-        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
-        long lastSampleTimeNanos = System.nanoTime();
-        Map<ThreadVO, Long> lastCpuTimes = ThreadUtil.snapshot(threadMXBean);
+
+        List<ThreadVO> oldThreads = ThreadUtil.getThreads();
+        long oldGetCupTimeNanos = System.nanoTime();
+        Map<ThreadVO, Long> oldCpuTimes = ThreadUtil.getThreadsCpuTimes(oldThreads, true);
         try {
             Thread.sleep(interval);
         } catch (InterruptedException e) {
             return e.getMessage();
         }
-        List<ThreadVO> topNThreads = ThreadUtil.mergeAndSort(threadMXBean, lastCpuTimes, lastSampleTimeNanos);
+        List<ThreadVO> newThreads = ThreadUtil.getThreads();
+        long newGetCupTimeNanos = System.nanoTime();
+        Map<ThreadVO, Long> newCpuTimes = ThreadUtil.getThreadsCpuTimes(newThreads, true);
+        List<ThreadVO> topNThreads = ThreadUtil.addCpuUsage(newGetCupTimeNanos- oldGetCupTimeNanos, oldCpuTimes, newCpuTimes, newThreads);
         if (CollectionUtils.isEmpty(topNThreads)) {
             return null;
         }
@@ -83,6 +82,55 @@ public class JvmController {
         return JSONObject.toJSONString(new ThreadModel(busyThreadInfos));
     }
 
+    @GetMapping("/thread/state")
+    public String geThread(@RequestParam(value = "state") String state,
+                           @RequestParam(value = "interval", defaultValue = "2000") Integer interval) {
+        List<ThreadVO> threads = ThreadUtil.getThreads();
+
+        // 统计各种线程状态
+        Map<Thread.State, Integer> stateCountMap = new LinkedHashMap<>();
+        for (Thread.State s : Thread.State.values()) {
+            stateCountMap.put(s, 0);
+        }
+
+        for (ThreadVO thread : threads) {
+            Thread.State threadState = thread.getState();
+            Integer count = stateCountMap.get(threadState);
+            stateCountMap.put(threadState, count + 1);
+        }
+
+        List<ThreadVO> resultThreads = new ArrayList<>();
+        boolean includeInternalThreads = true;
+        if (state != null && !"".equals(state) && threadStates.contains(state.toUpperCase())) {
+            String stateUpperCase = state.toUpperCase();
+            includeInternalThreads = false;
+            for (ThreadVO thread : threads) {
+                if (thread.getState() != null && stateUpperCase.equals(thread.getState().name())) {
+                    resultThreads.add(thread);
+                }
+            }
+        } else {
+            resultThreads = threads;
+        }
+
+        //thread stats
+        long oldGetCupTimeNanos = System.nanoTime();
+        Map<ThreadVO, Long> oldCpuTimes = ThreadUtil.getThreadsCpuTimes(resultThreads, includeInternalThreads);
+
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException e) {
+            return e.getMessage();
+        }
+
+        long newGetCupTimeNanos = System.nanoTime();
+        Map<ThreadVO, Long> newCpuTimes = ThreadUtil.getThreadsCpuTimes(resultThreads, includeInternalThreads);
+
+        List<ThreadVO> threadStats = ThreadUtil.addCpuUsage(newGetCupTimeNanos- oldGetCupTimeNanos, oldCpuTimes, newCpuTimes, resultThreads);
+
+        return JSONObject.toJSONString(new ThreadModel(threadStats, stateCountMap, includeInternalThreads));
+    }
+
     @GetMapping("/thread/{id}")
     public String threadInfo(@PathVariable long id) {
         if (id <= 0) {
@@ -93,6 +141,16 @@ public class JvmController {
             return null;
         }
         return JSONObject.toJSONString(new ThreadModel(threadInfos[0]));
+    }
+
+
+    @GetMapping("/thread/block")
+    public String threadBlocking() {
+        BlockingLockInfo blockingLockInfo = ThreadUtil.findMostBlockingLock();
+        if (blockingLockInfo.getThreadInfo() == null) {
+            return null;
+        }
+        return JSONObject.toJSONString(new ThreadModel(blockingLockInfo));
     }
 
     private long[] unboxing(List<Long> list) {

@@ -2,7 +2,7 @@ package com.example.god.model.thread;
 
 import sun.management.ManagementFactoryHelper;
 
-import java.lang.management.ThreadMXBean;
+import java.lang.management.*;
 import java.util.*;
 
 
@@ -62,26 +62,31 @@ public class ThreadUtil {
         return threadVO;
     }
 
-    public static Map<ThreadVO, Long> snapshot(ThreadMXBean threadMXBean) {
+    private static Map<String, Long> getInternalThreadCpuTimes() {
+        return ManagementFactoryHelper.getHotspotThreadMBean().getInternalThreadCpuTimes();
+    }
+
+    public static Map<ThreadVO, Long> getThreadsCpuTimes(List<ThreadVO> threads, boolean includeInternalThreads) {
         Map<ThreadVO, Long> lastCpuTimes = new HashMap<>();
-        List<ThreadVO> threads = getThreads();
         for (ThreadVO thread : threads) {
             if (thread.getId() > 0) {
-                long cpu = threadMXBean.getThreadCpuTime(thread.getId());
+                long cpu = ManagementFactory.getThreadMXBean().getThreadCpuTime(thread.getId());
                 lastCpuTimes.put(thread, cpu);
                 thread.setTime(cpu / 1000000);
             }
         }
 
         // add internal threads
-        Map<String, Long> internalThreadCpuTimes = getInternalThreadCpuTimes();
-        if (internalThreadCpuTimes != null) {
-            for (Map.Entry<String, Long> entry : internalThreadCpuTimes.entrySet()) {
-                String key = entry.getKey();
-                ThreadVO thread = createThreadVO(key);
-                thread.setTime(entry.getValue() / 1000000);
-                threads.add(thread);
-                lastCpuTimes.put(thread, entry.getValue());
+        if (includeInternalThreads) {
+            Map<String, Long> internalThreadCpuTimes = getInternalThreadCpuTimes();
+            if (internalThreadCpuTimes != null) {
+                for (Map.Entry<String, Long> entry : internalThreadCpuTimes.entrySet()) {
+                    String key = entry.getKey();
+                    ThreadVO thread = createThreadVO(key);
+                    thread.setTime(entry.getValue() / 1000000);
+                    threads.add(thread);
+                    lastCpuTimes.put(thread, entry.getValue());
+                }
             }
         }
 
@@ -92,40 +97,16 @@ public class ThreadUtil {
             return Long.compare(l2, l1);
         });
         return lastCpuTimes;
+
+
     }
 
-
-    private static Map<String, Long> getInternalThreadCpuTimes() {
-        return ManagementFactoryHelper.getHotspotThreadMBean().getInternalThreadCpuTimes();
-    }
-
-    public static List<ThreadVO> mergeAndSort(ThreadMXBean threadMXBean, Map<ThreadVO, Long> lastCpuTimes, long lastSampleTimeNanos) {
-
-        long newSampleTimeNanos = System.nanoTime();
-        List<ThreadVO> threads = getThreads();
-
-        // Resample
-        Map<ThreadVO, Long> newCpuTimes = new HashMap<>(threads.size());
-        for (ThreadVO thread : threads) {
-            if (thread.getId() > 0) {
-                long cpu = threadMXBean.getThreadCpuTime(thread.getId());
-                newCpuTimes.put(thread, cpu);
-            }
-        }
-        // internal threads
-        Map<String, Long> newInternalThreadCpuTimes = getInternalThreadCpuTimes();
-        if (newInternalThreadCpuTimes != null) {
-            for (Map.Entry<String, Long> entry : newInternalThreadCpuTimes.entrySet()) {
-                ThreadVO threadVO = createThreadVO(entry.getKey());
-                threads.add(threadVO);
-                newCpuTimes.put(threadVO, entry.getValue());
-            }
-        }
+    public static List<ThreadVO> addCpuUsage(long intervalTimeNanos, Map<ThreadVO, Long> oldCpuTimes, Map<ThreadVO, Long> newCpuTimes, List<ThreadVO> threads) {
 
         // Compute delta time
         final Map<ThreadVO, Long> deltas = new HashMap<>(threads.size());
         for (ThreadVO thread : newCpuTimes.keySet()) {
-            Long t = lastCpuTimes.get(thread);
+            Long t = oldCpuTimes.get(thread);
             if (t == null) {
                 t = 0L;
             }
@@ -140,12 +121,10 @@ public class ThreadUtil {
             deltas.put(thread, delta);
         }
 
-        long sampleIntervalNanos = newSampleTimeNanos - lastSampleTimeNanos;
-
         // Compute cpu usage
         final HashMap<ThreadVO, Double> cpuUsages = new HashMap<>(threads.size());
         for (ThreadVO thread : threads) {
-            double cpu = sampleIntervalNanos == 0 ? 0 : (deltas.get(thread) * 10000 / sampleIntervalNanos / 100.0);
+            double cpu = deltas.get(thread) * 10000 / intervalTimeNanos / 100.0;
             cpuUsages.put(thread, cpu);
         }
 
@@ -165,8 +144,69 @@ public class ThreadUtil {
             thread.setTime(timeMills);
             thread.setDeltaTime(deltaTime);
         }
-        lastCpuTimes = newCpuTimes;
-        lastSampleTimeNanos = newSampleTimeNanos;
         return threads;
+    }
+
+    public static BlockingLockInfo findMostBlockingLock() {
+        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        ThreadInfo[] infos = threadMXBean.dumpAllThreads(threadMXBean.isObjectMonitorUsageSupported(),
+                threadMXBean.isSynchronizerUsageSupported());
+
+        // a map of <LockInfo.getIdentityHashCode, number of thread blocking on this>
+        Map<Integer, Integer> blockCountPerLock = new HashMap<>();
+        // a map of <LockInfo.getIdentityHashCode, the thread info that holding this lock
+        Map<Integer, ThreadInfo> ownerThreadPerLock = new HashMap<>();
+
+        for (ThreadInfo info: infos) {
+            if (info == null) {
+                continue;
+            }
+
+            LockInfo lockInfo = info.getLockInfo();
+            if (lockInfo != null) {
+                // the current thread is blocked waiting on some condition
+                if (blockCountPerLock.get(lockInfo.getIdentityHashCode()) == null) {
+                    blockCountPerLock.put(lockInfo.getIdentityHashCode(), 0);
+                }
+                int blockedCount = blockCountPerLock.get(lockInfo.getIdentityHashCode());
+                blockCountPerLock.put(lockInfo.getIdentityHashCode(), blockedCount + 1);
+            }
+
+            for (MonitorInfo monitorInfo: info.getLockedMonitors()) {
+                // the object monitor currently held by this thread
+                if (ownerThreadPerLock.get(monitorInfo.getIdentityHashCode()) == null) {
+                    ownerThreadPerLock.put(monitorInfo.getIdentityHashCode(), info);
+                }
+            }
+
+            for (LockInfo lockedSync: info.getLockedSynchronizers()) {
+                // the ownable synchronizer currently held by this thread
+                if (ownerThreadPerLock.get(lockedSync.getIdentityHashCode()) == null) {
+                    ownerThreadPerLock.put(lockedSync.getIdentityHashCode(), info);
+                }
+            }
+        }
+
+        // find the thread that is holding the lock that blocking the largest number of threads.
+        int mostBlockingLock = 0; // System.identityHashCode(null) == 0
+        int maxBlockingCount = 0;
+        for (Map.Entry<Integer, Integer> entry: blockCountPerLock.entrySet()) {
+            if (entry.getValue() > maxBlockingCount && ownerThreadPerLock.get(entry.getKey()) != null) {
+                // the lock is explicitly held by anther thread.
+                maxBlockingCount = entry.getValue();
+                mostBlockingLock = entry.getKey();
+            }
+        }
+
+        if (mostBlockingLock == 0) {
+            // nothing found
+            return new BlockingLockInfo();
+        }
+
+        BlockingLockInfo blockingLockInfo = new BlockingLockInfo();
+        blockingLockInfo.setThreadInfo(ownerThreadPerLock.get(mostBlockingLock));
+        blockingLockInfo.setLockIdentityHashCode(mostBlockingLock);
+        blockingLockInfo.setBlockingThreadCount(blockCountPerLock.get(mostBlockingLock));
+        return blockingLockInfo;
     }
 }
