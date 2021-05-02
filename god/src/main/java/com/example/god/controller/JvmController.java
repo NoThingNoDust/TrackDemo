@@ -11,11 +11,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -24,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/god")
-public class GodController {
+@RequestMapping("/jvm")
+public class JvmController {
 
     @Resource
     private JvmUtil jvmUtil;
@@ -33,7 +28,7 @@ public class GodController {
     @Resource
     private Configure configure;
 
-    @GetMapping("/jvm")
+    @GetMapping("/info")
     public String jvm() {
         return JSONObject.toJSONString(jvmUtil.getJvmDetails().getJvmInfo());
     }
@@ -99,23 +94,6 @@ public class GodController {
         }
         return JSONObject.toJSONString(new ThreadModel(threadInfos[0]));
     }
-
-//    @PostMapping("/compiler")
-//    public String compiler() {
-//        //获取系统Java编译器
-//        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//        //获取Java文件管理器
-//        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-//        //定义要编译的源文件
-//        File file = new File("/Users/liule/Documents/HelloController.java");
-//        //通过源文件获取到要编译的Java类源码迭代器，包括所有内部类，其中每个类都是一个 JavaFileObject，也被称为一个汇编单元
-//        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects(file);
-//        //生成编译任务
-//        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, null, null, compilationUnits);
-//        //执行编译任务
-//        task.call();
-//        return "OK";
-//    }
 
     private long[] unboxing(List<Long> list) {
         if (CollectionUtils.isEmpty(list)) {
