@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.god.config.Configure;
 import com.example.god.model.jvm.JvmUtil;
 import com.example.god.model.thread.*;
+import com.sun.management.HotSpotDiagnosticMXBean;
+import com.sun.management.VMOption;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.util.*;
 
@@ -151,6 +154,39 @@ public class JvmController {
             return null;
         }
         return JSONObject.toJSONString(new ThreadModel(blockingLockInfo));
+    }
+
+    @GetMapping("/option")
+    public String vmOption(@RequestParam(value = "name") String optionName) {
+        HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean = ManagementFactory
+                .getPlatformMXBean(HotSpotDiagnosticMXBean.class);
+        if (optionName == null || "".equals(optionName)) {
+            return JSONObject.toJSONString(hotSpotDiagnosticMXBean.getDiagnosticOptions());
+        } else {
+            VMOption vmOption = hotSpotDiagnosticMXBean.getVMOption(optionName);
+            return JSONObject.toJSONString(vmOption);
+        }
+    }
+
+    @PostMapping("/option")
+    public String updateVmOption(@RequestParam(value = "name") String name,
+                                 @RequestParam(value = "value") String value) {
+        if (name == null || "".equals(name) || value == null || "".equals(value)) {
+            return null;
+        }
+        HotSpotDiagnosticMXBean hotSpotDiagnosticMXBean = ManagementFactory
+                .getPlatformMXBean(HotSpotDiagnosticMXBean.class);
+        VMOption vmOption = hotSpotDiagnosticMXBean.getVMOption(name);
+        if (Objects.isNull(vmOption)) {
+            return null;
+        }
+        String optionValue = vmOption.getValue();
+        if (optionValue.equals(value)) {
+            return null;
+        }
+        hotSpotDiagnosticMXBean.setVMOption(name, value);
+        String afterValue = hotSpotDiagnosticMXBean.getVMOption(name).getValue();
+        return name + " from" + optionValue + " change to " + afterValue;
     }
 
     private long[] unboxing(List<Long> list) {
