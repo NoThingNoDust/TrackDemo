@@ -1,5 +1,8 @@
 package com.example.demo.track.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.example.demo.track.model.RunTimeNode;
 import com.example.demo.track.model.SystemStatistic;
 import com.example.demo.track.service.RunTimeNodeService;
@@ -37,8 +40,10 @@ public class KoTimeController {
 
     @GetMapping("/getTree")
     @ResponseBody
-    public RunTimeNode getTree(@RequestParam("methodName") String methodName) {
-        return RunTimeNodeService.getGraph(methodName);
+    public JSONObject getTree(@RequestParam("methodName") String methodName) {
+        RunTimeNode graph = RunTimeNodeService.getGraph(methodName);
+        String s = JSON.toJSONString(graph, SerializerFeature.DisableCircularReferenceDetect);
+        return JSON.parseObject(s);
     }
 
 }

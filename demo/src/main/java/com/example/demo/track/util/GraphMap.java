@@ -40,22 +40,6 @@ public class GraphMap {
     }
 
     public static RunTimeNode getTree(String key) {
-        RunTimeNode root = runTimeNodeMap.get(key);
-        if (root==null) {
-            return root;
-        }
-        root.setValue(root.getAvgRunTime());
-        List<RunTimeNode> children = root.getChildren();
-        if (children!=null&&children.size()>0) {
-            children.forEach(child->{
-                String childKey = child.getClassName()+"."+child.getMethodName();
-                RunTimeNode newChild = getTree(childKey);
-                if (newChild!=null) {
-                    child.setChildren(newChild.getChildren());
-                    child.setValue(child.getAvgRunTime());
-                }
-            });
-        }
-        return root;
+        return runTimeNodeMap.get(key);
     }
 }

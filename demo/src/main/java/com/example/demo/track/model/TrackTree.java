@@ -1,5 +1,6 @@
 package com.example.demo.track.model;
 
+import com.example.demo.track.util.GraphMap;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class TrackTree {
         if (now.getParent() != null) {
             now = now.getParent();
         }else{
+            GraphMap.put(root.getClassName()+"."+root.getMethodName(),root);
             root.print();
         }
     }
