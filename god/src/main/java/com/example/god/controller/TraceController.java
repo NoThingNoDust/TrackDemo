@@ -19,10 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
-@RequestMapping("/koTime")
+@RequestMapping("/trace")
 public class TraceController {
-    @Value("${koTime.ui.template:freemarker}")
-    private String showTemplate;
 
     /**
      * 此处静态资源访问
@@ -37,11 +35,7 @@ public class TraceController {
         SystemStatistic system = RunTimeNodeService.getRunStatistic();
         model.addAttribute("system",system);
         model.addAttribute("config", Context.getConfig());
-        String template = "index-freemarker";
-        if ("thymeleaf".equals(showTemplate)) {
-            template = "index-thymeleaf";
-        }
-        return template   ;
+        return "index-thymeleaf";
     }
 
     @GetMapping("/getTree")
