@@ -1,6 +1,6 @@
-package com.example.demo.track.util;
+package com.example.god.model.trace.util;
 
-import com.example.demo.track.model.RunTimeNode;
+import com.example.god.model.trace.model.RunTimeNode;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.stereotype.Controller;

@@ -1,8 +1,7 @@
-package com.example.demo.track.model;
-
+package com.example.god.model.trace.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.example.demo.track.util.MethodType;
+import com.example.god.model.trace.util.MethodType;
 
 import java.util.List;
 import java.util.Objects;

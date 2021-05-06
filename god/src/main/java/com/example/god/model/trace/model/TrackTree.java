@@ -1,6 +1,6 @@
-package com.example.demo.track.model;
+package com.example.god.model.trace.model;
 
-import com.example.demo.track.util.GraphMap;
+import com.example.god.model.trace.util.GraphMap;
 import lombok.Data;
 
 import java.util.ArrayList;

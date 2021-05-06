@@ -1,8 +1,8 @@
-package com.example.demo.track.config;
+package com.example.god.model.trace.config;
 
-import com.example.demo.track.handler.RunTimeHandler;
-import com.example.demo.track.model.KoTimeConfig;
-import com.example.demo.track.util.Context;
+import com.example.god.model.trace.handler.RunTimeHandler;
+import com.example.god.model.trace.model.KoTimeConfig;
+import com.example.god.model.trace.util.Context;
 import org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

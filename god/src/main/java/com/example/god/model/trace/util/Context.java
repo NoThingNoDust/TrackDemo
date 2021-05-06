@@ -1,6 +1,7 @@
-package com.example.demo.track.util;
+package com.example.god.model.trace.util;
 
-import com.example.demo.track.model.KoTimeConfig;
+
+import com.example.god.model.trace.model.KoTimeConfig;
 
 public class Context {
 

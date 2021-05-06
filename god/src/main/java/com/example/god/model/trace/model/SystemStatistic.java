@@ -1,4 +1,4 @@
-package com.example.demo.track.model;
+package com.example.god.model.trace.model;
 
 
 public class SystemStatistic {

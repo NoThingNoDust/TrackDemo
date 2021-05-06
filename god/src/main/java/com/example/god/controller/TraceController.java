@@ -1,12 +1,12 @@
-package com.example.demo.track.controller;
+package com.example.god.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.example.demo.track.model.RunTimeNode;
-import com.example.demo.track.model.SystemStatistic;
-import com.example.demo.track.service.RunTimeNodeService;
-import com.example.demo.track.util.Context;
+import com.example.god.model.trace.model.RunTimeNode;
+import com.example.god.model.trace.model.SystemStatistic;
+import com.example.god.model.trace.service.RunTimeNodeService;
+import com.example.god.model.trace.util.Context;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,10 +20,16 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/koTime")
-public class KoTimeController {
+public class TraceController {
     @Value("${koTime.ui.template:freemarker}")
     private String showTemplate;
 
+    /**
+     * 此处静态资源访问
+     * @param model
+     * @param request
+     * @return
+     */
     @GetMapping
     public String index(Model model, HttpServletRequest request) {
         List<RunTimeNode> list = RunTimeNodeService.getControllers();
