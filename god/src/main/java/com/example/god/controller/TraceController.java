@@ -38,6 +38,11 @@ public class TraceController {
         return "index-thymeleaf";
     }
 
+    /**
+     * 获取调用链信息
+     * @param methodName
+     * @return
+     */
     @GetMapping("/getTree")
     @ResponseBody
     public JSONObject getTree(@RequestParam("methodName") String methodName) {
