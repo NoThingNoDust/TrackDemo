@@ -13,15 +13,18 @@ public class RunTimeHandler implements MethodInterceptor {
     public Object invoke(MethodInvocation invocation) throws Throwable {
         TrackTree trackTree = TrackTreePool.getTrackTree();
 
+        //开始计时
         long begin = System.nanoTime();
         trackTree.addNewNode();
-
         RunTimeNode now = trackTree.getNow();
         now.setPackageName(invocation.getThis().getClass().getPackage().getName());
         Object obj = invocation.proceed();
 
+        //结束计时
         long end = System.nanoTime();
+        //获取类名
         String className = invocation.getThis().getClass().getName();
+        //获取方法名
         String methodName = invocation.getMethod().getName();
         now.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         now.setClassName(className);
