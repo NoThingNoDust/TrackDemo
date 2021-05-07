@@ -12,7 +12,6 @@ public class RunTimeNode implements Comparable<RunTimeNode> {
     private String className;
     private String methodName;
     @JSONField(serialize=false)
-    private String packageName;
     private Double avgRunTime = 0.0;
     private Double value = 0.0;
     private String avgRunTimeUnit = "ms";
@@ -132,17 +131,9 @@ public class RunTimeNode implements Comparable<RunTimeNode> {
     }
 
     public void print() {
-        System.out.println(packageName +"."+ methodName + "调用了" + children.size() + "个方法======耗时" + avgRunTime);
+        System.out.println(className +"."+ methodName + "调用了" + children.size() + "个方法======耗时" + avgRunTime);
         for (RunTimeNode child : children) {
             child.print();
         }
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
     }
 }

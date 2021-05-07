@@ -124,7 +124,7 @@
         function show(element,name) {
             var myChart = echarts.init(element);
             myChart.showLoading();
-            $.get('${ctx.contextPath}/koTime/getTree?methodName=' + name, function (data) {
+            $.get('${ctx.contextPath}/trace/getTree?methodName=' + name, function (data) {
                 console.log(data)
                 myChart.hideLoading();
                 echarts.util.each(data.children, function (datum, index) {

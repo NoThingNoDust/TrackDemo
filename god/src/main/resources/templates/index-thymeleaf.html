@@ -130,7 +130,7 @@
         function show(element,name) {
             var myChart = echarts.init(element);
             myChart.showLoading();
-            $.get(contextPath+'/koTime/getTree?methodName=' + name, function (data) {
+            $.get(contextPath+'/trace/getTree?methodName=' + name, function (data) {
                 console.log(data)
                 myChart.hideLoading();
                 echarts.util.each(data.children, function (datum, index) {

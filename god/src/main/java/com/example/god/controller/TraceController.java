@@ -7,7 +7,6 @@ import com.example.god.model.trace.model.RunTimeNode;
 import com.example.god.model.trace.model.SystemStatistic;
 import com.example.god.model.trace.service.RunTimeNodeService;
 import com.example.god.model.trace.util.Context;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
