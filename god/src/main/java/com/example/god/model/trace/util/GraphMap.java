@@ -2,10 +2,7 @@ package com.example.god.model.trace.util;
 
 import com.example.god.model.trace.model.RunTimeNode;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GraphMap {
@@ -39,5 +36,9 @@ public class GraphMap {
 
     public static RunTimeNode getTree(String key) {
         return runTimeNodeMap.get(key);
+    }
+
+    public static List<RunTimeNode> getAll() {
+        return new ArrayList<>(runTimeNodeMap.values());
     }
 }

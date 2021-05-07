@@ -29,7 +29,8 @@ public class TraceController {
      */
     @GetMapping
     public String index(Model model, HttpServletRequest request) {
-        List<RunTimeNode> list = RunTimeNodeService.getControllers();
+        //获取所有调用链
+        List<RunTimeNode> list = RunTimeNodeService.getAll();
         model.addAttribute("list",list);
         SystemStatistic system = RunTimeNodeService.getRunStatistic();
         model.addAttribute("system",system);

@@ -100,4 +100,8 @@ public class RunTimeNodeService {
     public static RunTimeNode getGraph(String methodName) {
         return GraphMap.getTree(methodName);
     }
+
+    public static List<RunTimeNode> getAll() {
+        return GraphMap.getAll();
+    }
 }
