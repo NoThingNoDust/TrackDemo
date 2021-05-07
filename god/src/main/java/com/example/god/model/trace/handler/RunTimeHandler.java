@@ -6,10 +6,13 @@ import com.example.god.model.trace.model.TrackTreePool;
 import com.example.god.model.trace.util.Common;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.servlet.Filter;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class RunTimeHandler implements MethodInterceptor {
 
@@ -21,9 +24,14 @@ public class RunTimeHandler implements MethodInterceptor {
         //获取类名
         String className = clazz.getName();
         //获取方法名
-        String methodName = invocation.getMethod().getName();
+        Method method = invocation.getMethod();
+        String methodName = method.getName();
         //跳过Bean实例化
         if (className.contains("$")) {
+            return invocation.proceed();
+        }
+        //跳过定时任务任务
+        if (Objects.nonNull(method.getAnnotation(Scheduled.class))) {
             return invocation.proceed();
         }
         //跳过拦截器
