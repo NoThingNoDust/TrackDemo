@@ -92,6 +92,11 @@ public class RunTimeNodeService {
         return list;
     }
 
+    /**
+     * 根据methodName从GraphMap中查询RunTimeNode
+     * @param methodName
+     * @return
+     */
     public static RunTimeNode getGraph(String methodName) {
         return GraphMap.getTree(methodName);
     }
