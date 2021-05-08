@@ -35,7 +35,7 @@ public class DefaultConfig {
     public AspectJExpressionPointcutAdvisor configurabledvisor() {
         AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
 //        advisor.setExpression(pointcut);
-        advisor.setExpression(pointcut + " && !execution(* com.example.god.controller..*.*(..))");
+        advisor.setExpression(pointcut + " && !execution(* com.example.god..*.*(..))");
         advisor.setAdvice(new RunTimeHandler());
         return advisor;
     }

@@ -3,6 +3,7 @@ package com.example.god.model.trace.handler;
 import com.example.god.model.trace.model.RunTimeNode;
 import com.example.god.model.trace.model.TrackTree;
 import com.example.god.model.trace.model.TrackTreePool;
+import com.example.god.model.trace.service.InvokeService;
 import com.example.god.model.trace.util.Common;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -10,13 +11,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.servlet.Filter;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class RunTimeHandler implements MethodInterceptor {
 
     private static final List<String> filterMethods = Arrays.asList("init", "doFilter", "destroy");
+    //调用链map，维护一套调用链列表
+    private static final Map<String, RunTimeNode> traceMap = new HashMap<>();
+
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -44,7 +46,31 @@ public class RunTimeHandler implements MethodInterceptor {
             }
         }
 
+        RunTimeNode the = new RunTimeNode();
+        the.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
+        the.setClassName(className);
+        the.setMethodName(methodName);
+        the.setMethodType(Common.getMethodType(invocation));
+        the.setChildren(new ArrayList<>());
+
+        String thePath = className + "." + methodName;
+
         TrackTree trackTree = TrackTreePool.getTrackTree();
+
+        String parentPath = TrackTreePool.getParent();
+        //如果当前父路径为空，则表示此为初次进入
+        if (parentPath == null) {
+            parentPath = thePath;
+            TrackTreePool.setParent(parentPath);
+            traceMap.put(parentPath, the);
+        } else {
+            //非初次进入，则将父runTimeNode拿出来，然后处理。
+            parentPath = getParentPath(className);
+            RunTimeNode runTimeNode = traceMap.get(parentPath);
+            List<RunTimeNode> children = runTimeNode.getChildren();
+            children.add(the);
+            traceMap.put(thePath, the);
+        }
 
         //开始计时
         long begin = System.nanoTime();
@@ -56,18 +82,51 @@ public class RunTimeHandler implements MethodInterceptor {
 
         //结束计时
         long end = System.nanoTime();
+
+        //塞入计时
+        RunTimeNode runTimeNode = traceMap.get(thePath);
+        runTimeNode.setAvgRunTime((end - begin) / 1000000.0);
+        runTimeNode.setValue(runTimeNode.getAvgRunTime());
+
         now.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         now.setClassName(className);
         now.setMethodName(methodName);
         now.setAvgRunTime((end - begin) / 1000000.0);
         now.setMethodType(Common.getMethodType(invocation));
         now.setValue(now.getAvgRunTime());
+
+
+
         trackTree.rollback();
 //
-//        String packName = invocation.getThis().getClass().getPackage().getName();
-//        RunTimeNode parent = InvokeService.getParentRunTimeNode(packName);
-//        RunTimeNode current = InvokeService.getCurrentRunTimeNode(invocation, ((end - begin) / 1000000.0));
-//        InvokeService.createGraph(parent, current);
+        String packName = invocation.getThis().getClass().getPackage().getName();
+        RunTimeNode parent = InvokeService.getParentRunTimeNode(packName);
+        RunTimeNode current = InvokeService.getCurrentRunTimeNode(invocation, ((end - begin) / 1000000.0));
+        InvokeService.createGraph(parent, current);
         return obj;
+    }
+
+    /**
+     * 获取当前类的父类+父方法名
+     * @param className 类名
+     */
+    private String getParentPath(String className) {
+        //拼接上cjlib关键字
+        String cglibTag = "$$EnhancerBySpringCGLIB$$";
+        if (className.contains(cglibTag)) {
+            return null;
+        }
+        className += cglibTag;
+        StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
+        for (int i = 0; i < stacks.length; i++) {
+            StackTraceElement stack = stacks[i];
+            if (stack.getClassName().startsWith(className)) {
+                StackTraceElement parent = stacks[i + 1];
+                System.out.println(className +"parent="+ parent.getClassName() + "." + parent.getMethodName());
+                //获取当当前类的父类名字和父类方法
+                return parent.getClassName() + "." + parent.getMethodName();
+            }
+        }
+        return null;
     }
 }
