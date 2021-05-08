@@ -1,6 +1,6 @@
 package com.example.god.model.trace.service;
 
-import com.example.god.model.trace.model.RunTimeNode;
+import com.example.god.model.process.tree.RunTimeNode;
 import com.example.god.model.trace.model.SystemStatistic;
 import com.example.god.model.trace.util.Context;
 import com.example.god.model.trace.util.GraphMap;

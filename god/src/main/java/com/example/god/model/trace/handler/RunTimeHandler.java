@@ -1,7 +1,7 @@
 package com.example.god.model.trace.handler;
 
-import com.example.god.model.trace.model.RunTimeNode;
-import com.example.god.model.trace.model.TrackTree;
+import com.example.god.model.process.tree.RunTimeNode;
+import com.example.god.model.process.tree.TrackTree;
 import com.example.god.model.trace.model.TrackTreePool;
 import com.example.god.model.trace.service.InvokeService;
 import com.example.god.model.trace.util.Common;
@@ -47,7 +47,7 @@ public class RunTimeHandler implements MethodInterceptor {
         }
 
         RunTimeNode the = new RunTimeNode();
-        the.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
+        //     the.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         the.setClassName(className);
         the.setMethodName(methodName);
         the.setMethodType(Common.getMethodType(invocation));
@@ -86,15 +86,14 @@ public class RunTimeHandler implements MethodInterceptor {
         //塞入计时
         RunTimeNode runTimeNode = traceMap.get(thePath);
         runTimeNode.setAvgRunTime((end - begin) / 1000000.0);
-        runTimeNode.setValue(runTimeNode.getAvgRunTime());
+        //       runTimeNode.setValue(runTimeNode.getAvgRunTime());
 
-        now.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
+        //   now.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         now.setClassName(className);
         now.setMethodName(methodName);
         now.setAvgRunTime((end - begin) / 1000000.0);
         now.setMethodType(Common.getMethodType(invocation));
-        now.setValue(now.getAvgRunTime());
-
+        //   now.setValue(now.getAvgRunTime());
 
 
         trackTree.rollback();
@@ -108,6 +107,7 @@ public class RunTimeHandler implements MethodInterceptor {
 
     /**
      * 获取当前类的父类+父方法名
+     *
      * @param className 类名
      */
     private String getParentPath(String className) {
@@ -122,7 +122,7 @@ public class RunTimeHandler implements MethodInterceptor {
             StackTraceElement stack = stacks[i];
             if (stack.getClassName().startsWith(className)) {
                 StackTraceElement parent = stacks[i + 1];
-                System.out.println(className +"parent="+ parent.getClassName() + "." + parent.getMethodName());
+                System.out.println(className + "parent=" + parent.getClassName() + "." + parent.getMethodName());
                 //获取当当前类的父类名字和父类方法
                 return parent.getClassName() + "." + parent.getMethodName();
             }

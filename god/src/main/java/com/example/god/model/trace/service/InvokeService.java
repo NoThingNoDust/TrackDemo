@@ -1,7 +1,7 @@
 package com.example.god.model.trace.service;
 
 
-import com.example.god.model.trace.model.RunTimeNode;
+import com.example.god.model.process.tree.RunTimeNode;
 import com.example.god.model.trace.util.Common;
 import org.aopalliance.intercept.MethodInvocation;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -26,7 +26,7 @@ public class InvokeService {
         RunTimeNode parent = new RunTimeNode();
         parent.setClassName(parentClassName);
         parent.setMethodName(parentMothodName);
-        parent.setName(parentClassName.substring(parentClassName.lastIndexOf(".")+1)+"."+parentMothodName);
+      //  parent.setName(parentClassName.substring(parentClassName.lastIndexOf(".")+1)+"."+parentMothodName);
         parent.setMethodType(Common.getMethodType(parentClassName));
         parent.setChildren(new ArrayList<>());
         return parent;
@@ -36,7 +36,7 @@ public class InvokeService {
         String className = pjp.getThis().getClass().getName();
         String methodName = pjp.getMethod().getName();
         RunTimeNode current = new RunTimeNode();
-        current.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
+      //  current.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         current.setClassName(className);
         current.setMethodName(methodName);
         current.setAvgRunTime(runTime);
@@ -48,7 +48,7 @@ public class InvokeService {
         String className = pjp.getTarget().getClass().getName();
         String methodName = pjp.getSignature().getName();
         RunTimeNode current = new RunTimeNode();
-        current.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
+     //   current.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         current.setClassName(className);
         current.setMethodName(methodName);
         current.setAvgRunTime(runTime);

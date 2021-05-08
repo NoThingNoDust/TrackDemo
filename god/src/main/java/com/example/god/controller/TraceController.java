@@ -3,7 +3,7 @@ package com.example.god.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.example.god.model.trace.model.RunTimeNode;
+import com.example.god.model.process.tree.RunTimeNode;
 import com.example.god.model.trace.model.SystemStatistic;
 import com.example.god.model.trace.service.RunTimeNodeService;
 import com.example.god.model.trace.util.Context;
