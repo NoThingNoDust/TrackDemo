@@ -5,6 +5,7 @@ import com.example.god.model.process.formwork.model.MethodInfo;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,8 +35,8 @@ public class TrackTree {
     public void addNewNode(MethodInfo methodInfo) {
         RunTimeNode newNode = new RunTimeNode();
         newNode.setParent(now);
-        newNode.setChildren(new ArrayList<>());
-        now.getChildren().add(newNode);
+        newNode.setChildren(new ArrayList<>(Collections.singletonList(now)));
+        newNode.setMethodInfo(methodInfo);
         now = newNode;
     }
 
@@ -44,6 +45,7 @@ public class TrackTree {
      */
     public void rollback(ExecuteTime executeTime) {
         if (now != root) {
+            now.setExecuteTime(executeTime);
             now = now.getParent();
         }
     }
