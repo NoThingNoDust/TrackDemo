@@ -1,7 +1,7 @@
 package com.example.god.model.trace.handler;
 
-import com.example.god.model.process.tree.RunTimeNode;
-import com.example.god.model.process.tree.TrackTree;
+import com.example.god.model.process.tree.model.RunTimeNode;
+import com.example.god.model.process.tree.model.TrackTree;
 import com.example.god.model.trace.model.TrackTreePool;
 import com.example.god.model.trace.service.InvokeService;
 import com.example.god.model.trace.util.Common;
@@ -48,9 +48,9 @@ public class RunTimeHandler implements MethodInterceptor {
 
         RunTimeNode the = new RunTimeNode();
         //     the.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
-        the.setClassName(className);
-        the.setMethodName(methodName);
-        the.setMethodType(Common.getMethodType(invocation));
+        the.getMethodInfo().setClassName(className);
+        the.getMethodInfo().setMethodName(methodName);
+        the.getMethodInfo().setMethodType(Common.getMethodType(invocation));
         the.setChildren(new ArrayList<>());
 
         String thePath = className + "." + methodName;
@@ -74,7 +74,7 @@ public class RunTimeHandler implements MethodInterceptor {
 
         //开始计时
         long begin = System.nanoTime();
-        trackTree.addNewNode();
+        trackTree.addNewNode(null);
 
         RunTimeNode now = trackTree.getNow();
 
@@ -85,18 +85,18 @@ public class RunTimeHandler implements MethodInterceptor {
 
         //塞入计时
         RunTimeNode runTimeNode = traceMap.get(thePath);
-        runTimeNode.setAvgRunTime((end - begin) / 1000000.0);
+        runTimeNode.getExecuteTime().setAvgRunTime((end - begin) / 1000000.0);
         //       runTimeNode.setValue(runTimeNode.getAvgRunTime());
 
         //   now.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
-        now.setClassName(className);
-        now.setMethodName(methodName);
-        now.setAvgRunTime((end - begin) / 1000000.0);
-        now.setMethodType(Common.getMethodType(invocation));
+        now.getMethodInfo().setClassName(className);
+        now.getMethodInfo().setMethodName(methodName);
+        now.getExecuteTime().setAvgRunTime((end - begin) / 1000000.0);
+        now.getMethodInfo().setMethodType(Common.getMethodType(invocation));
         //   now.setValue(now.getAvgRunTime());
 
 
-        trackTree.rollback();
+        trackTree.rollback(null);
 //
         String packName = invocation.getThis().getClass().getPackage().getName();
         RunTimeNode parent = InvokeService.getParentRunTimeNode(packName);

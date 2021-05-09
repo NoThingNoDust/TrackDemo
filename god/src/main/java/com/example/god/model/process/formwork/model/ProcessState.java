@@ -1,7 +1,7 @@
 package com.example.god.model.process.formwork.model;
 
 /**
- * 进程状态
+ * 生命周期状态
  */
 public enum ProcessState {
     /**

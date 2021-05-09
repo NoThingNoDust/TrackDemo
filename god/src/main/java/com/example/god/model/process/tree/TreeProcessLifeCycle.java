@@ -3,7 +3,9 @@ package com.example.god.model.process.tree;
 
 import com.example.god.model.process.formwork.ProcessLifeCycle;
 import com.example.god.model.process.formwork.model.ExecuteInfo;
+import com.example.god.model.process.formwork.model.MethodInfo;
 import com.example.god.model.process.formwork.model.ProcessState;
+import com.example.god.model.process.tree.model.TrackTree;
 
 /**
  * 树形事务生命周期
@@ -25,14 +27,14 @@ public class TreeProcessLifeCycle extends ProcessLifeCycle {
     @Override
     public void call(ExecuteInfo executeInfo) {
         if (processState == ProcessState.RUNNING) {
-            trackTree.addNewNode();
+            trackTree.addNewNode((MethodInfo) executeInfo);
         }
     }
 
     @Override
     public void ret(ExecuteInfo executeInfo) {
         if (processState == ProcessState.RUNNING) {
-            trackTree.rollback();
+            trackTree.rollback(null);
         }
     }
 

@@ -3,7 +3,7 @@ package com.example.god.model.process.formwork.model;
 import com.example.god.model.trace.util.MethodType;
 
 /**
- * 执行的方法信息
+ * 执行方法信息
  */
 public class MethodInfo extends ExecuteInfo {
     /**

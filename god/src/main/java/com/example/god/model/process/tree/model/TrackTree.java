@@ -1,5 +1,7 @@
-package com.example.god.model.process.tree;
+package com.example.god.model.process.tree.model;
 
+import com.example.god.model.process.formwork.model.ExecuteTime;
+import com.example.god.model.process.formwork.model.MethodInfo;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ public class TrackTree {
     private RunTimeNode now;
 
     public TrackTree() {
+        //伪根
         root = new RunTimeNode();
         root.setChildren(new ArrayList<>());
         now = root;
@@ -28,7 +31,7 @@ public class TrackTree {
     /**
      * 新增子节点
      */
-    public void addNewNode() {
+    public void addNewNode(MethodInfo methodInfo) {
         RunTimeNode newNode = new RunTimeNode();
         newNode.setParent(now);
         newNode.setChildren(new ArrayList<>());
@@ -39,7 +42,7 @@ public class TrackTree {
     /**
      * 返回父节点
      */
-    public void rollback() {
+    public void rollback(ExecuteTime executeTime) {
         if (now != root) {
             now = now.getParent();
         }
