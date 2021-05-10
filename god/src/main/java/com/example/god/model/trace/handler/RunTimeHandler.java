@@ -17,7 +17,7 @@ public class RunTimeHandler implements MethodInterceptor {
 
     private static final List<String> filterMethods = Arrays.asList("init", "doFilter", "destroy");
     //调用链map，维护一套调用链列表
-    private static final Map<String, RunTimeNode> traceMap = new HashMap<>();
+    private static final Map<String, Map<String, RunTimeNode>> traceMap = new HashMap<>();
 
 
     @Override
@@ -62,14 +62,20 @@ public class RunTimeHandler implements MethodInterceptor {
         if (parentPath == null) {
             parentPath = thePath;
             TrackTreePool.setParent(parentPath);
-            traceMap.put(parentPath, the);
+            traceMap.remove(parentPath);
+            Map<String, RunTimeNode> map = new HashMap<>();
+            map.put(parentPath, the);
+            traceMap.put(parentPath, map);
         } else {
             //非初次进入，则将父runTimeNode拿出来，然后处理。
             parentPath = getParentPath(className);
-            RunTimeNode runTimeNode = traceMap.get(parentPath);
+
+            Map<String, RunTimeNode> map = traceMap.get(parentPath);
+            RunTimeNode runTimeNode = map.get(parentPath);
             List<RunTimeNode> children = runTimeNode.getChildren();
             children.add(the);
-            traceMap.put(thePath, the);
+            map.put(thePath, the);
+            traceMap.put(TrackTreePool.getParent(), map);
         }
 
         //开始计时
@@ -84,7 +90,7 @@ public class RunTimeHandler implements MethodInterceptor {
         long end = System.nanoTime();
 
         //塞入计时
-        RunTimeNode runTimeNode = traceMap.get(thePath);
+        RunTimeNode runTimeNode = traceMap.get(TrackTreePool.getParent()).get(thePath);
         runTimeNode.getExecuteTime().setAvgRunTime((end - begin) / 1000000.0);
         //       runTimeNode.setValue(runTimeNode.getAvgRunTime());
 

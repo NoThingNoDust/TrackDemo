@@ -16,6 +16,10 @@ import java.lang.management.ThreadInfo;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * jvm配置信息入口
+ * @author liule
+ */
 @RestController
 @RequestMapping("/jvm")
 public class JvmController {

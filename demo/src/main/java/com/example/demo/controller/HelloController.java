@@ -29,8 +29,12 @@ public class HelloController {
 
     @GetMapping("/hello")
     public String hello() throws UnknownHostException, InterruptedException {
-        aaaService.AAA1();
-        aaaService.AAA2();
+        if (true) {
+            return "sss";
+        } else {
+            aaaService.AAA1();
+            aaaService.AAA2();
+        }
         aaaService.AAA3();
         bbbService.BBB1();
         bbbService.BBB2();

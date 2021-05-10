@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+/**
+ * 调用链追踪入口
+ * @author liule
+ */
 @Controller
 @RequestMapping("/trace")
 public class TraceController {
