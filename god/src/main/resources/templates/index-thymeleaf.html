@@ -80,6 +80,7 @@
                         <span th:if="${runtime.executeTime.avgRunTime ge config.timeThreshold}" class="'layui-badge layui-bg-red" th:text="'平均响应 '+${runtime.executeTime.avgRunTime}+' 毫秒'"></span>
                         <span th:if="${runtime.executeTime.avgRunTime lt config.timeThreshold}" class="'layui-badge layui-bg-green" th:text="'平均响应 '+${runtime.executeTime.avgRunTime}+' 毫秒'"></span>
                     </h2>
+                    <!-- 此处bug 鼠标悬停不能显示全部路径 -->
                     <div  class="layui-colla-content viewer" style="width: 1500px;height:600px;"> </div>
                 </div>
         </div>
