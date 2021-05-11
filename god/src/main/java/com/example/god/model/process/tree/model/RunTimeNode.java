@@ -9,6 +9,12 @@ import java.util.Objects;
  * 树形方法执行记录
  */
 public class RunTimeNode extends TreeNode<RunTimeNode> implements Comparable<RunTimeNode> {
+
+
+    private String name;
+
+    private Double value = 0.0;
+
     /**
      * 方法信息
      */
@@ -51,5 +57,17 @@ public class RunTimeNode extends TreeNode<RunTimeNode> implements Comparable<Run
         for (RunTimeNode child : children) {
             child.print();
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getValue() {
+        return executeTime.getAvgRunTime();
     }
 }

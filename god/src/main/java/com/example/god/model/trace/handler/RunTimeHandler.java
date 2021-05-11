@@ -53,6 +53,7 @@ public class RunTimeHandler implements MethodInterceptor {
         the.getMethodInfo().setClassName(className);
         the.getMethodInfo().setMethodName(methodName);
         the.getMethodInfo().setMethodType(Common.getMethodType(invocation));
+        the.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         the.setChildren(new ArrayList<>());
 
         String thePath = className + "." + methodName;

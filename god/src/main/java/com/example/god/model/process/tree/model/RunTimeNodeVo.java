@@ -8,6 +8,7 @@ public class RunTimeNodeVo extends RunTimeNode {
     private Double value = 0.0;
 
 
+    @Override
     public Double getValue() {
         return value;
     }
@@ -17,10 +18,12 @@ public class RunTimeNodeVo extends RunTimeNode {
     }
 
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
