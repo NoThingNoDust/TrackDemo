@@ -33,10 +33,7 @@ public class RunTimeHandler implements MethodInterceptor {
         if (className.contains("$")) {
             return invocation.proceed();
         }
-        //跳过定时任务任务
-        if (Objects.nonNull(method.getAnnotation(Scheduled.class))) {
-            return invocation.proceed();
-        }
+
         //跳过拦截器
         if (filterMethods.contains(methodName)) {
             Class<?>[] interfaces = clazz.getInterfaces();
@@ -59,6 +56,11 @@ public class RunTimeHandler implements MethodInterceptor {
         String thePath = className + "." + methodName;
 
         TrackTree trackTree = TrackTreePool.getTrackTree();
+
+        Scheduled annotation = method.getAnnotation(Scheduled.class);
+        if (Objects.nonNull(annotation)) {
+            TrackTreePool.setParent(null);
+        }
 
         String parentPath = TrackTreePool.getParent();
         //如果当前父路径为空，则表示此为初次进入

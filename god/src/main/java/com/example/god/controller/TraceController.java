@@ -6,10 +6,10 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.example.god.model.process.tree.model.RunTimeNode;
 import com.example.god.model.trace.handler.RunTimeHandler;
 import com.example.god.model.trace.model.SystemStatistic;
-import com.example.god.model.trace.service.RunTimeNodeService;
 import com.example.god.model.trace.util.Context;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 调用链追踪入口
@@ -49,8 +50,24 @@ public class TraceController {
 
         //获取所有调用链
         model.addAttribute("list", list);
-        SystemStatistic system = RunTimeNodeService.getRunStatistic();
-        model.addAttribute("system",system);
+        SystemStatistic systemStatistic = new SystemStatistic();
+        if (!CollectionUtils.isEmpty(list)) {
+            int delayNum = (int) list.stream().filter(controllerApi -> controllerApi.getExecuteTime().getAvgRunTime() >= Context.getConfig().getTimeThreshold()).count();
+            systemStatistic.setDelayNum(delayNum);
+            int normalNum = (int) list.stream().filter(controllerApi -> controllerApi.getExecuteTime().getAvgRunTime() < Context.getConfig().getTimeThreshold()).count();
+            systemStatistic.setNormalNum(normalNum);
+            int totalNum = list.size();
+            systemStatistic.setTotalNum(totalNum);
+            Double max = list.stream().map(api -> api.getExecuteTime().getAvgRunTime()).max(Double::compareTo).get();
+            Double min = list.stream().map(api -> api.getExecuteTime().getAvgRunTime()).min(Double::compareTo).get();
+            Double avg = list.stream().map(api -> api.getExecuteTime().getAvgRunTime()).collect(Collectors.averagingDouble(Double::doubleValue));
+            systemStatistic.setMaxRunTime(max);
+            systemStatistic.setMinRunTime(min);
+            systemStatistic.setAvgRunTime(avg);
+
+        }
+
+        model.addAttribute("system",systemStatistic);
         model.addAttribute("config", Context.getConfig());
         return "index-thymeleaf";
     }
