@@ -1,5 +1,6 @@
 package com.example.god.model.trace.handler;
 
+import com.example.god.model.process.formwork.model.MethodInfo;
 import com.example.god.model.process.tree.model.RunTimeNode;
 import com.example.god.model.process.tree.model.TrackTree;
 import com.example.god.model.trace.model.TrackTreePool;
@@ -17,7 +18,7 @@ public class RunTimeHandler implements MethodInterceptor {
 
     private static final List<String> filterMethods = Arrays.asList("init", "doFilter", "destroy");
     //调用链map，维护一套调用链列表
-    private static final Map<String, Map<String, RunTimeNode>> traceMap = new HashMap<>();
+    public static final Map<String, Map<String, RunTimeNode>> traceMap = new HashMap<>();
 
 
     @Override
@@ -47,6 +48,7 @@ public class RunTimeHandler implements MethodInterceptor {
         }
 
         RunTimeNode the = new RunTimeNode();
+        the.setMethodInfo(new MethodInfo());
         //     the.setName(className.substring(className.lastIndexOf(".")+1)+"."+methodName);
         the.getMethodInfo().setClassName(className);
         the.getMethodInfo().setMethodName(methodName);
@@ -62,15 +64,15 @@ public class RunTimeHandler implements MethodInterceptor {
         if (parentPath == null) {
             parentPath = thePath;
             TrackTreePool.setParent(parentPath);
-            traceMap.remove(parentPath);
+            traceMap.remove(TrackTreePool.getParent());
             Map<String, RunTimeNode> map = new HashMap<>();
             map.put(parentPath, the);
-            traceMap.put(parentPath, map);
+            traceMap.put(TrackTreePool.getParent(), map);
         } else {
             //非初次进入，则将父runTimeNode拿出来，然后处理。
             parentPath = getParentPath(className);
 
-            Map<String, RunTimeNode> map = traceMap.get(parentPath);
+            Map<String, RunTimeNode> map = traceMap.get(TrackTreePool.getParent());
             RunTimeNode runTimeNode = map.get(parentPath);
             List<RunTimeNode> children = runTimeNode.getChildren();
             children.add(the);

@@ -23,16 +23,16 @@ function getOption(data,threshold){
                     position: 'right',
                     formatter: function(params){
                         var bg = "titleBgGreen"
-                        if (params.value>threshold) {
+                        if (params.data.executeTime.avgRunTime>threshold) {
                             bg = "titleBgRed"
                         }
                         return [
                             '{'+bg+'|  指标}',
-                            '  {aa|}方法：'+params.name+" ",
+                            '  {aa|}方法：'+params.data.methodInfo.methodName+" ",
                             '{hr|}',
-                            '  {aa|}耗时： '+params.data.avgRunTime+" ms ",
+                            '  {aa|}耗时： '+params.data.executeTime.avgRunTime+" ms ",
                             '{hr|}',
-                            '  {aa|}类型： '+params.data.methodType+" "
+                            '  {aa|}类型： '+params.data.methodInfo.methodType+" "
                         ].join('\n');
                     },
                     backgroundColor: '#ddd',

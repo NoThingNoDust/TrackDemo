@@ -3,6 +3,8 @@ package com.example.god.model.process.tree.model;
 import com.example.god.model.process.formwork.model.ExecuteTime;
 import com.example.god.model.process.formwork.model.MethodInfo;
 
+import java.util.Objects;
+
 /**
  * 树形方法执行记录
  */
@@ -18,6 +20,9 @@ public class RunTimeNode extends TreeNode<RunTimeNode> implements Comparable<Run
 
 
     public MethodInfo getMethodInfo() {
+        if (Objects.isNull(methodInfo)) {
+            methodInfo = new MethodInfo();
+        }
         return methodInfo;
     }
 
@@ -26,6 +31,9 @@ public class RunTimeNode extends TreeNode<RunTimeNode> implements Comparable<Run
     }
 
     public ExecuteTime getExecuteTime() {
+        if (Objects.isNull(executeTime)) {
+            executeTime = new ExecuteTime();
+        }
         return executeTime;
     }
 
