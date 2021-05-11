@@ -123,12 +123,15 @@
             var layer = layui.layer;
 
             element.on('collapse(test)', function (data) {
+                <!-- 此处的data是怎么来的？？？ -->
                 id = data.title['0'].id
                 show(data.content['0'],id)
             });
         });
 
         function show(element,name) {
+            <!-- 此处的element里,鼠标悬停的数据已经拿不到里 -->
+            console.log(element);
             var myChart = echarts.init(element);
             myChart.showLoading();
             $.get(contextPath+'/trace/getTree?methodName=' + name, function (data) {
