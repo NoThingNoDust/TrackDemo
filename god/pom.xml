@@ -77,6 +77,18 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.75</version>
         </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.10.18</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.10.18</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -133,7 +133,7 @@ public class RunTimeHandler implements MethodInterceptor {
             StackTraceElement stack = stacks[i];
             if (stack.getClassName().startsWith(className)) {
                 StackTraceElement parent = stacks[i + 1];
-                System.out.println(className + "parent=" + parent.getClassName() + "." + parent.getMethodName());
+//                System.out.println(className + "parent=" + parent.getClassName() + "." + parent.getMethodName());
                 //获取当当前类的父类名字和父类方法
                 return parent.getClassName() + "." + parent.getMethodName();
             }

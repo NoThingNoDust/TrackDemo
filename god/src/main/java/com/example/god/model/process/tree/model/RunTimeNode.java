@@ -53,10 +53,10 @@ public class RunTimeNode extends TreeNode<RunTimeNode> implements Comparable<Run
     }
 
     public void print() {
-        System.out.println(methodInfo.getClassName() + "." + methodInfo.getMethodName() + "调用了" + children.size() + "个方法======耗时" + this.executeTime.getAvgRunTime());
-        for (RunTimeNode child : children) {
-            child.print();
-        }
+//        System.out.println(methodInfo.getClassName() + "." + methodInfo.getMethodName() + "调用了" + children.size() + "个方法======耗时" + this.executeTime.getAvgRunTime());
+//        for (RunTimeNode child : children) {
+//            child.print();
+//        }
     }
 
     public String getName() {

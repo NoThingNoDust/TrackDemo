@@ -14,7 +14,7 @@ import java.util.Collection;
 @Data
 public class Configure {
 
-    @Value("${god.agent.path:/Users/liule/Documents/agent/agent-0.0.2.jar}")
+    @Value("${god.agent.path:/Users/liule/Documents/agent/}")
     private String agentPath;
 
     @Value("${god.cache.path:/Users/liule/Documents}")
