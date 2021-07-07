@@ -6,6 +6,7 @@ import com.example.god.model.clazz.*;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import net.bytebuddy.agent.ByteBuddyAgent;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -27,7 +29,7 @@ public class ClassController {
     @Resource
     private Configure configure;
 
-    @GetMapping("/search")
+    @GetMapping("/search/class")
     public String getClazz(@RequestParam(value = "hashCode", required = false) String hashCode,
                          @RequestParam(value = "classLoaderClass", required = false) String classLoaderClass,
                          @RequestParam(value = "className") String className,
@@ -71,6 +73,46 @@ public class ClassController {
 
         return JSONObject.toJSONString(searchClassModel);
     }
+
+
+    @GetMapping("/search/method")
+    public String getMethod(@RequestParam(value = "hashCode", required = false) String hashCode,
+                            @RequestParam(value = "classLoaderClass", required = false) String classLoaderClass,
+                            @RequestParam(value = "className") String className,
+                            @RequestParam(value = "methodName", required = false) String methodName,
+                            @RequestParam(value = "isDetail", defaultValue = "true") boolean isDetail) {
+        Instrumentation inst = ByteBuddyAgent.install();
+
+        if (hashCode == null && classLoaderClass != null) {
+            List<ClassLoader> matchedClassLoaders = ClassLoaderUtils.getClassLoaderByClassName(inst, classLoaderClass);
+            if (matchedClassLoaders.size() == 1) {
+                hashCode = Integer.toHexString(matchedClassLoaders.get(0).hashCode());
+            } else if (matchedClassLoaders.size() > 1) {
+                return "Found more than one classloader by class name";
+            } else {
+                return null;
+            }
+        }
+
+        List<Class<?>> matchedClasses = new ArrayList<>(SearchUtils.searchClass(inst, className, hashCode));
+        List<SearchMethodModel> models = new ArrayList<>();
+        for (Class<?> clazz : matchedClasses) {
+            try {
+                for (Method method : clazz.getDeclaredMethods()) {
+                    if (!StringUtils.isEmpty(methodName) && !methodName.equals(method.getName())) {
+                        continue;
+                    }
+                    models.add(new SearchMethodModel(ClassUtils.createMethodInfo(method, clazz, isDetail), isDetail));
+                }
+            } catch (Error e) {
+                e.printStackTrace();
+            }
+        }
+
+        return JSONObject.toJSONString(models);
+    }
+
+
 
     public void test() throws Exception{
 
